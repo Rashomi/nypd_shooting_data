@@ -1,100 +1,7 @@
 ---
-title: "NYPD Shooting data"
-author: "Shepard Dog"
-date: "02/08/2021"
-output: html_document
----
-
-### NYPD shooting data analysis
-
-Importing libraries and data.
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-# Libraries
-library(tidyverse)
-library(lubridate)
-
-```
-This week's assignment was to analyze and visualize shooting data of NYPD. The link to the data set could be found  [here](https://data.cityofnewyork.us/Public-Safety/NYPD-Shooting-Incident-Data-Historic-/833y-fsy8/data)
-
-__Instruction__: Start an Rmd document that describes and imports the shooting project dataset in a reproducible manner.
-Getting the summary of raw data set as per the assignment instruction and getting the summary.
-
-
-```{r data_import, echo=TRUE}
-nypd_url = "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"
-#Reading as a CSV file shooting data
-nypd_shoot <- read_csv(nypd_url)
-
-#checking the data import process
-# view(nypd_shoot)
-summary(nypd_shoot)
-```
-
-__As per the summary the data set contains 23,568 observations and 19 variables.__
-
-__Instruction__
-Add to your Rmd document a summary of the data and clean up your dataset by changing appropriate variables to factor and date types and getting rid of any columns not needed.  Show the summary of your data to be sure there is no missing data. If there is missing data, describe how you plan to handle it.
-
-#### Tidying data
-
-The summary generated makes no sense. Therefore needs to do some data tidying, which include removing variables, that has no relevant to the analysis and changing the data type of some variables.
-
-The following variables will have no bearing on the analysis of the data set. Therefore will remove the irreverent columns. Apart from this data is already in a tidy format with each variable in each column and observation in each row. 
-
-##### To remove
-* X and y coordinate data
-* Latitude and longitude data
-* Shooting time 
-* Jurisdiction code
-* Statistical murder flag
-* location description
-* Incident key
-
-
-```{r tidy_transform_1, echo=TRUE}
-#removing irrelevant columns from the data set
-nypd_shoot_tidy <- nypd_shoot %>% select(-c(Latitude, Longitude, Lon_Lat, X_COORD_CD, Y_COORD_CD, STATISTICAL_MURDER_FLAG, LOCATION_DESC, JURISDICTION_CODE,PRECINCT,OCCUR_TIME))
-# view(nypd_shoot_tidy)
-# summary(nypd_shoot_tidy)
-```
-
-##### Data type conversion
-To get a sensible summary from the nypd_shoot data frame the variables needs to be in proper data type. Currently all variables are of type char.
-
-I will change the perp and vic age groups to factors, because the ages are given as group and not as a number, further it is unlikely that any arithmetical operations will be performed on the perp and vic's ages.
-
-##### To change datatype
-* Occurrence date to date object 
-* Age groups of perpetrators and victims. - factors
-* Gender of perpetrators and victims. - factors
-* Race of perpetrators and victims. - factors
-
-```{r tidy_transform, echo=TRUE}
-nypd_shoot_tidy <- nypd_shoot_tidy %>%
-  mutate(PERP_AGE_GROUP = as.factor(PERP_AGE_GROUP),
-         PERP_SEX = as.factor(PERP_SEX),
-         PERP_RACE = as.factor(PERP_RACE),
-         VIC_AGE_GROUP = as.factor(VIC_AGE_GROUP),
-         VIC_SEX = as.factor(VIC_SEX),
-         VIC_RACE = as.factor(VIC_RACE),
-         BORO = as.factor(BORO))
-```
-
-##### Changing the date format
-```{r testing_1, echo=TRUE}
-nypd_shoot_tidy <- nypd_shoot_tidy %>% mutate(OCCUR_DATE = mdy(OCCUR_DATE))
-view(nypd_shoot_tidy)
-#Checking the summary of data again after tidying the data set as per the instruction.
-summary(nypd_shoot_tidy)
-
-```
-
----
-title: "Assignment_w3"
+title: "NYPD shooting"
 author: ''
-date: "6/27/2021"
+date: "8/2/2021"
 output:
   html_document:
     df_print: paged
@@ -358,5 +265,4 @@ NYPD or Police in general may be biased against the minorities in the US. Accord
 
 __Include NYC population data__
 I tried to collect New York population by borough for the period of 2006 to 2020, but was not able to. Having population data may have improved the analysis.  
-
 
