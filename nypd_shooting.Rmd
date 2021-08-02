@@ -1,0 +1,362 @@
+---
+title: "NYPD Shooting data"
+author: "Shepard Dog"
+date: "02/08/2021"
+output: html_document
+---
+
+### NYPD shooting data analysis
+
+Importing libraries and data.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Libraries
+library(tidyverse)
+library(lubridate)
+
+```
+This week's assignment was to analyze and visualize shooting data of NYPD. The link to the data set could be found  [here](https://data.cityofnewyork.us/Public-Safety/NYPD-Shooting-Incident-Data-Historic-/833y-fsy8/data)
+
+__Instruction__: Start an Rmd document that describes and imports the shooting project dataset in a reproducible manner.
+Getting the summary of raw data set as per the assignment instruction and getting the summary.
+
+
+```{r data_import, echo=TRUE}
+nypd_url = "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"
+#Reading as a CSV file shooting data
+nypd_shoot <- read_csv(nypd_url)
+
+#checking the data import process
+# view(nypd_shoot)
+summary(nypd_shoot)
+```
+
+__As per the summary the data set contains 23,568 observations and 19 variables.__
+
+__Instruction__
+Add to your Rmd document a summary of the data and clean up your dataset by changing appropriate variables to factor and date types and getting rid of any columns not needed.  Show the summary of your data to be sure there is no missing data. If there is missing data, describe how you plan to handle it.
+
+#### Tidying data
+
+The summary generated makes no sense. Therefore needs to do some data tidying, which include removing variables, that has no relevant to the analysis and changing the data type of some variables.
+
+The following variables will have no bearing on the analysis of the data set. Therefore will remove the irreverent columns. Apart from this data is already in a tidy format with each variable in each column and observation in each row. 
+
+##### To remove
+* X and y coordinate data
+* Latitude and longitude data
+* Shooting time 
+* Jurisdiction code
+* Statistical murder flag
+* location description
+* Incident key
+
+
+```{r tidy_transform_1, echo=TRUE}
+#removing irrelevant columns from the data set
+nypd_shoot_tidy <- nypd_shoot %>% select(-c(Latitude, Longitude, Lon_Lat, X_COORD_CD, Y_COORD_CD, STATISTICAL_MURDER_FLAG, LOCATION_DESC, JURISDICTION_CODE,PRECINCT,OCCUR_TIME))
+# view(nypd_shoot_tidy)
+# summary(nypd_shoot_tidy)
+```
+
+##### Data type conversion
+To get a sensible summary from the nypd_shoot data frame the variables needs to be in proper data type. Currently all variables are of type char.
+
+I will change the perp and vic age groups to factors, because the ages are given as group and not as a number, further it is unlikely that any arithmetical operations will be performed on the perp and vic's ages.
+
+##### To change datatype
+* Occurrence date to date object 
+* Age groups of perpetrators and victims. - factors
+* Gender of perpetrators and victims. - factors
+* Race of perpetrators and victims. - factors
+
+```{r tidy_transform, echo=TRUE}
+nypd_shoot_tidy <- nypd_shoot_tidy %>%
+  mutate(PERP_AGE_GROUP = as.factor(PERP_AGE_GROUP),
+         PERP_SEX = as.factor(PERP_SEX),
+         PERP_RACE = as.factor(PERP_RACE),
+         VIC_AGE_GROUP = as.factor(VIC_AGE_GROUP),
+         VIC_SEX = as.factor(VIC_SEX),
+         VIC_RACE = as.factor(VIC_RACE),
+         BORO = as.factor(BORO))
+```
+
+##### Changing the date format
+```{r testing_1, echo=TRUE}
+nypd_shoot_tidy <- nypd_shoot_tidy %>% mutate(OCCUR_DATE = mdy(OCCUR_DATE))
+view(nypd_shoot_tidy)
+#Checking the summary of data again after tidying the data set as per the instruction.
+summary(nypd_shoot_tidy)
+
+```
+
+---
+title: "Assignment_w3"
+author: ''
+date: "6/27/2021"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+### NYPD shooting data analysis
+
+Importing libraries and data.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Libraries
+library(tidyverse)
+library(lubridate)
+
+```
+
+This week's assignment is on analyzing and visualizing shooting data of NYPD. The link to the data set could be found  [here](https://data.cityofnewyork.us/Public-Safety/NYPD-Shooting-Incident-Data-Historic-/833y-fsy8/data)
+
+Even though I worked with the url of the data set I also downloaded the file as a CSV file, and following the good practices of data analysis I created a project directory for this project and stored all relevant data under appropriate directories. the same analysis can be run either from the url or the downloaded CSV file.  
+
+Since there were no instructions to share the project files, no directories were shared  
+
+__Instruction__: Start an Rmd document that describes and imports the shooting project dataset in a reproducible manner.
+
+```{r file_paths, echo =TRUE}
+
+# Downloaded version is stored in the project directory and can be access through the below code. This is platform independent.
+# This code to run only if the project files were shared
+#file.path("raw_data", "nypd_shooting_data.csv")
+
+```
+Getting the summary of raw data set as per the assignment instruction and getting the summary. 
+```{r data_import, echo=TRUE}
+nypd_url = "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"
+#Reading as a CSV file shooting data
+nypd_shoot <- read_csv(nypd_url)
+
+#checking the data import process
+# view(nypd_shoot)
+summary(nypd_shoot)
+
+```
+__As per the summary the data set contains 23,568 observations and 19 variables.__
+
+__Instruction__
+
+Add to your Rmd document a summary of the data and clean up your dataset by changing appropriate variables to factor and date types and getting rid of any columns not needed.  Show the summary of your data to be sure there is no missing data. If there is missing data, describe how you plan to handle it.
+
+#### Tidying data
+
+The summary generated makes no sense. Therefore needs to do some data tidying, which include removing variables, that has no relevant to the analysis and changing the data type of some variables.
+
+The following variables will have no bearing on the analysis of the data set. Therefore will remove the irreverent columns. Apart from this data is already in a tidy format with each variable in each column and observation in each row. 
+
+##### To remove
+* X and y coordinate data
+* Latitude and longitude data
+* Shooting time 
+* Jurisdiction code
+* Statistical murder flag
+* location description
+* Incident key
+
+```{r tidy_transform_1, echo=TRUE}
+#removing irrelevant columns from the data set
+nypd_shoot_tidy <- nypd_shoot %>% select(-c(Latitude, Longitude, Lon_Lat, X_COORD_CD, Y_COORD_CD, STATISTICAL_MURDER_FLAG, LOCATION_DESC, JURISDICTION_CODE,PRECINCT,OCCUR_TIME))
+# view(nypd_shoot_tidy)
+# summary(nypd_shoot_tidy)
+
+```
+
+##### Data type conversion
+To get a sensible summary from the nypd_shoot data frame the variables needs to be in proper data type. Currently all variables are of type char.
+
+I will change the perp and vic age groups to factors, because the ages are given as group and not as a number, further it is unlikely that any arithmetical operations will be performed on the perp and vic's ages.
+
+##### To change datatype
+* Occurrence date to date object 
+* Age groups of perpetrators and victims. - factors
+* Gender of perpetrators and victims. - factors
+* Race of perpetrators and victims. - factors
+
+```{r tidy_transform_2, echo=TRUE}
+nypd_shoot_tidy <- nypd_shoot_tidy %>%
+  mutate(PERP_AGE_GROUP = as.factor(PERP_AGE_GROUP),
+         PERP_SEX = as.factor(PERP_SEX),
+         PERP_RACE = as.factor(PERP_RACE),
+         VIC_AGE_GROUP = as.factor(VIC_AGE_GROUP),
+         VIC_SEX = as.factor(VIC_SEX),
+         VIC_RACE = as.factor(VIC_RACE),
+         BORO = as.factor(BORO))
+```
+
+##### Changing the date format
+```{r testing_1, echo=TRUE}
+nypd_shoot_tidy <- nypd_shoot_tidy %>% mutate(OCCUR_DATE = mdy(OCCUR_DATE))
+view(nypd_shoot_tidy)
+#Checking the summary of data again after tidying the data set as per the instruction.
+summary(nypd_shoot_tidy)
+
+```
+__After tidying data there are still 23,568 observations. This means no data were lost during the process.__ This can also be confirmed by checking the incident key values. All incident key values remain the same in both data sets. 
+
+##### Dealing with NAs (missing values)  
+
+`r sum(is.na.data.frame(nypd_shoot))` there are over 25000 data with missing values. (PERP_RACE) has the highest with 8425 missing values. Removing NA values from the data set as per the instruction. I will create a new data frame containing only the complete values. 
+
+```{r remove_missing, echo = TRUE}
+#Removing NAs 
+nypd_shoot_complete <- na.omit(nypd_shoot_tidy) 
+summary(nypd_shoot_complete)
+
+```
+There are only 15,109 complete entries after removing N/As as opposed to a total of 23,568 cases. Therefor the possible shooting incidents occurred in New York city during the period of 2006.01.01 and 2020.12.31 is 23,568. 
+
+Adding number of cases to the data set
+```{r data_checking, echo=TRUE}
+#Including the number of cases to the data set 
+nypd_shoot_complete <- nypd_shoot_complete %>% count(OCCUR_DATE, BORO, PERP_AGE_GROUP,PERP_SEX,PERP_RACE,VIC_AGE_GROUP, VIC_SEX, VIC_RACE) %>% rename(Cases = n)
+
+#Checking if any data were lost on the process
+sum(nypd_shoot_complete$Cases)
+sum(nypd_shoot_complete$Cases[nypd_shoot_complete$BORO == "BRONX"])
+sum(nypd_shoot_complete$Cases[nypd_shoot_complete$PERP_AGE_GROUP == "25-44" ])
+sum(nypd_shoot_complete$Cases[nypd_shoot_complete$PERP_RACE == "UNKNOWN" ])
+# Total number of cases as well as numbers under different category remains the same and therefore no data were lost during the process.
+```
+
+
+##### Starting the analysis
+
+The analysis of shooting data by 5 borough of New York city provides with the following information
+
+During the data collection period (from 2006-0101 to 2020-12-29) there were a total of `r sum(nypd_shoot_complete$ Cases)` (15,109) shooting cases were recorded in the complete data set. 
+
+Of this highest number of cases reported on a day was 18. Minimum number of cases recorded in a day was 1. During the period considered at least there was one shooting event that took place in the New York city. As per the summary the highest number of cases were reported in Brooklyn (5744) and the lowest number was reported in Staten Island (566). According to this data the safest borough in the New York city is Staten Island. And the unsafest borough is Brooklyn.
+
+### Data Visulaizing
+#### Analysis by borough
+
+```{r plot by_brough, echo=TRUE}
+
+#By Borough and by date basic analysis
+#vis1
+nypd_shoot_tidy %>% na.omit(nypd_shoot_tidy) %>% count(BORO, OCCUR_DATE)%>% ggplot(aes(OCCUR_DATE, n))+ geom_point(aes(color = BORO))+labs(x = "Incident Date", y = "Number of Cases")+ facet_wrap(~BORO, nrow = 3)+ theme(legend.position="bottom")
+
+#vis2
+nypd_shoot_tidy %>% na.omit(nypd_shoot_tidy) %>% count (OCCUR_DATE, BORO) %>% ggplot(aes(OCCUR_DATE, n))+
+           geom_point(aes(color = BORO ))+
+labs(x = "Incident Date", y = "Number of Cases")+ theme(legend.position="bottom")
+  
+```
+
+There are two sets of visualizations. The first set of graphs provides date vs number of cases for individual borough. This will make the comparison easy
+The other graph shows all reported shooting events of the 5 borough plotted in the same graph.
+According to the graphs the maximum number of shooting events took place in the same day, in the same borough is 18 and it was in Bronx on 2018-01-06.
+Also from the graph it is evident during the period at least there was one shoot event took place in the New York city. 
+
+Average shootings in New York city during the period is ~ 3 (2.75).  
+```{r, rude_time_cal, echo=TRUE}
+time_diff <- difftime("2020-12-29", "2006-01-01", units = "days")
+tot_cases <- sum(nypd_shoot_complete$ Cases)
+tot_cases/as.double(time_diff)
+```
+
+```{r  viz_2, echo=TRUE}
+#using R, base plot function
+nypd_shoot_tidy %>% na.omit(nypd_shoot_tidy) %>% ggplot(aes(x = BORO))+geom_bar(fill="#B19CD8")
+
+```
+The above histogram plots the total number of cases vs borough. This is for the time period 2006-01-01 through 2020-12-29, this shows which borough has the highest and lowest shooting incidents. 
+
+
+#### Analysis by perpetrator's race
+```{r perp_race, echo=TRUE}
+
+by_perp_race <- nypd_shoot_complete %>% count(OCCUR_DATE, PERP_RACE) %>% rename(Cases = n)
+
+by_perp_race %>% ggplot(aes(OCCUR_DATE, Cases))+
+           geom_point(aes(color = PERP_RACE ))+
+labs(x = "Incident Date", y = "Number of Cases")+ facet_wrap(~PERP_RACE, nrow = 4)+
+  theme(legend.position="bottom")
+by_perp_race %>% ggplot(aes(OCCUR_DATE, Cases))+
+           geom_point(aes(color = PERP_RACE ))+
+labs(x = "Incident Date", y = "Number of Cases")+ 
+  theme(legend.position="bottom")
+
+nypd_shoot_tidy %>% na.omit(nypd_shoot_tidy) %>% ggplot(aes(x = PERP_RACE, fill = PERP_RACE ))+
+  geom_bar() + theme(legend.position="bottom")
+```
+
+```{r victim, echo=TRUE}
+nypd_shoot_complete %>% count(OCCUR_DATE, VIC_RACE) %>% rename(Cases = n) %>% ggplot(aes(OCCUR_DATE, Cases))+
+           geom_point(aes(color = VIC_RACE ))+
+labs(x = "Incident Date", y = "Number of Cases")+ facet_wrap(~VIC_RACE, nrow = 3)+
+theme(legend.position="bottom")
+```
+
+The above graphs follow  similar patterns. From the above graphs and the summary statistics I have been calculating with __nypd_shoot_complete data sets it is evident that most of the perpetrator and victims were black males between 18-24 ages, and victims were also from the same categories. Except that a majority of the victims were between the ages of 25- 44.
+The second highest perpetrator group is Hispanic (white), followed by Hispanic black.
+
+__The graphs show a decline in shooting over the years.__
+
+I want to confirm this by doing some data modeling.
+
+##### Steps in Data Modeling Process.
+To test my theory of shooting events have come down over the years I am going to create a new data frame where I group data by year and summarize them (Use count() function to do both.)
+
+I use this data frame to make a simple prediction. It looks like the relation between the cases and the years is a liner one with a -ve gradient (or coefficient) (y = -mx +c.) 
+
+##### Data Modeling
+```{r data_modeling, echo=TRUE}
+
+by_year <- nypd_shoot_complete %>% mutate(the_year = year(OCCUR_DATE))
+by_year <- by_year %>% count(the_year) %>% rename(Cases=n)
+test_1 <- lm(Cases ~ the_year, data = by_year)
+summary(test_1)
+test_2 <- by_year %>% mutate(pred=predict(test_1))
+
+
+#by_year <- nypd_shoot_complete %>% mutate(the_year = #year(OCCUR_DATE)) %>% count(the_year) %>% rename(Cases = n)
+#test_mod <- lm(Cases ~ the_year, data = by_year)
+#year_predict <- by_year %>% mutate(Pred = predict(test_mod))
+#view(year_predict)
+```
+
+#### Plotting the year Vs actual cases and predicitions.
+```{r model_plot, echo=TRUE}
+
+test_2 %>% ggplot()+
+  geom_point(aes(x = the_year, y = Cases), color = "blue")+
+  geom_point(aes(x=the_year, y= pred), color = "red") +
+  labs(x = "Year", y = "Number of Cases") 
+   
+
+
+```
+
+#### For further investigations 
+It looks like the predictions (red dots) and actual cases (blue dots) are somewhat concurrent and the trend is linear with a negative gradient. This is a good news, this means with the time the shooting incidents in the New York city will de declined. However in 2019 and in 2020, there seems to be a slight deviation from the general trend. 
+
+Also 2010 to 2015 period there is a significant reduction in shootings. There may be several reason, including political, social and legal etc.
+
+##### Possible personal biases and how to minimize them
+I am not very familiar with political or social context of US, to do a good analysis on biases. However most international news sources quote gun violence as a major issue in the US. I am also aware that during 2008- 2016 period the US government was trying to bring in laws to control gun violence and gun ownership. Perhaps the significant dip in the shootings in the period was due to the efforts of the US government trying the control the gun ownership of its citizens. But this kind of claim can not be made based on one data set or analysis. further analysis needs to be carried out across different states before arriving at such a conclusion. 
+
+While I do not have any biases on races, or the people from any particular demography within US, I am prejudiced about guns and weapons. Therefore I may show a partiality on gun controls laws. In order to avoid my own biases, before making any analysis on the drop in shooting during 2010- 2015 period I wish to analysis more data from different states within the US. 
+
+#### Possible biases in the data set. 
+
+NYPD or Police in general may be biased against the minorities in the US. According to the the data set an overwhelming majority of the perpetrators (and also victims were Black and Hispanics). There may be several reasons for this.
+
+*   Overwhelming majority may in fact be Black or Hispanic
+*   Possibility of extra policing in the Black and Hispanic residential areas may lead to collect more data on shooting related violence. 
+*   Over 8000 observations had their race missing (and were subsequently removed from the analysis) and may have contributed towards this.
+
+#### How to further improve the analysis 
+
+__Include NYC population data__
+I tried to collect New York population by borough for the period of 2006 to 2020, but was not able to. Having population data may have improved the analysis.  
+
+
